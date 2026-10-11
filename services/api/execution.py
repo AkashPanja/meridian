@@ -91,6 +91,19 @@ def exit_check(live: dict[str, float]) -> list[Fill]:
     return closed
 
 
+def eod_flatten(live: dict[str, float]) -> list[Fill]:
+    """15:15 IST watchdog: close every OPEN position at market, whatever the P&L."""
+    global _seq
+    closed: list[Fill] = []
+    for pos in _positions.values():
+        if pos.status != "OPEN" or pos.instrument not in live:
+            continue
+        pos.status = "EOD"
+        _seq += 1
+        closed.append(Fill(f"ORD-{_seq:04d}", pos.qty, live[pos.instrument], _brokerage(pos.qty * live[pos.instrument])))
+    return closed
+
+
 # ponytail: one runnable self-check, no framework. Run: python execution.py
 if __name__ == "__main__":
     p = re.Plan("NIFTY", "long", 24850, 24780, 25000, 150, 8200)
@@ -114,4 +127,11 @@ if __name__ == "__main__":
     submit(p2, d2.token, "k-4", 53210)
     tg = exit_check({"BANKNIFTY": 52790})
     assert len(tg) == 1, "short target triggers below target"
-    print(f"ok execution: 9/9, fill {r1.fill.order_id} @ {r1.fill.price} fees {r1.fill.fees}")
+    p3 = re.Plan("RELIANCE", "long", 2940, 2918, 3010, 250, 5500)
+    d3 = re.decide(p3, pf, re.Market(2940, 1.0), re.Config())
+    assert d3.approved
+    submit(p3, d3.token, "k-5", 2940)
+    flat = eod_flatten({"RELIANCE": 2935, "NIFTY": 24900})
+    assert len(flat) == 1 and flat[0].price == 2935, "EOD closes at market"
+    assert all(v.status != "OPEN" for v in _positions.values()), "EOD leaves nothing open"
+    print(f"ok execution: 11/11, fill {r1.fill.order_id} @ {r1.fill.price} fees {r1.fill.fees}")

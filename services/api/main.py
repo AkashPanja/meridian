@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import risk_engine as re
-from execution import exit_check, submit
+from execution import eod_flatten, exit_check, submit
 
 app = FastAPI(title="Meridian API", version="0.1.0")
 
@@ -79,3 +79,9 @@ class ExitCheckIn(BaseModel):
 def exitcheck(body: ExitCheckIn) -> dict:
     fills = exit_check(body.prices)
     return {"closed": [f.__dict__ for f in fills]}
+
+
+@app.post("/api/eod")
+def eod(body: ExitCheckIn) -> dict:
+    fills = eod_flatten(body.prices)
+    return {"closed": [f.__dict__ for f in fills], "open": 0}
