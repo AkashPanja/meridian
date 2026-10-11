@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* ponytail: dark-first terminal tokens; light theme overrides below */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0d0d0d;
+  --surface: #141414;
+  --surface-hover: #1a1a1a;
+  --border: #2a2a2a;
+  --gain: #00d4aa;
+  --loss: #ff4757;
+  --warn: #ffb800;
+  --text: #ffffff;
+  --text-2: #aaaaaa;
+  --text-3: #828282;
+  --accent: #00d4aa;
+}
+
+:root[data-theme="light"] {
+  --bg: #f6f6f4;
+  --surface: #ffffff;
+  --surface-hover: #efefec;
+  --border: #e4e4e0;
+  --gain: #087a54;
+  --loss: #c42f40;
+  --warn: #8a5a00;
+  --text: #141414;
+  --text-2: #575a61;
+  --text-3: #8a8d94;
+  --accent: #087a54;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.num {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.gain {
+  color: var(--gain);
+}
+
+.loss {
+  color: var(--loss);
+}
+
+.muted {
+  color: var(--text-2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button {
+  min-height: 44px;
+}
+
+/* ponytail: 44px targets cover nav links too, not just buttons */
+.desk-nav a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+  background: var(--accent);
+  color: #000;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.skip-link:focus-visible {
+  left: 0;
+}
+
+/* full danger theme: whole shell goes red in LIVE, not just a badge */
+.live-shell {
+  box-shadow: inset 0 0 0 2px var(--loss);
+}
+
+.live-header {
+  background: color-mix(in srgb, var(--loss) 14%, var(--bg));
+  border-bottom: 1px solid var(--loss);
+}
+
+@keyframes tape {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  animation: tape 40s linear infinite;
+}
+
+@media (max-width: 900px) {
+  .desk-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
