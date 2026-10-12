@@ -13,10 +13,15 @@ from execution import eod_flatten, exit_check, submit
 
 app = FastAPI(title="Meridian API", version="0.1.0")
 
-# ponytail: locked to the local web app, no wildcard
+# ponytail: locked to the local web app, no wildcard (3000 legacy, 2090 current)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:2090",
+        "http://127.0.0.1:2090",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
